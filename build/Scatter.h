@@ -1,7 +1,10 @@
 ﻿#pragma once
 
 #include <typeinfo>
+#include <cliext\vector>
 #include <vector>
+#include <random>
+#include <cmath>
 
 using namespace System;
 using namespace System::ComponentModel::Composition;
@@ -43,7 +46,7 @@ namespace Nodes
 		IDiffSpread<int>^ FSeed;
 
 		[Output("Output")]
-		ISpread<Vector3D>^ FOutput;
+		IOutStream<Vector3D>^ FOutput;
 
 		[Import()]
 		ILogger^ FLogger;
@@ -65,10 +68,15 @@ namespace Nodes
 
 		bool Invalidate = false;
 
-		std::vector<Vector3>* positions;
+		cliext::vector<Vector3>^ positions;
 		ISpread<int>^ indices;
 
-		std::vector<float>* area;
+		float areaSum = 0;
+		std::vector<float>* areas;
+
+		void setUpVertex();
+
+		Vector3D randomPoint(const Vector3& p0, const Vector3& p1, const Vector3& p2, std::mt19937& mt);
 	};
 
 }

@@ -135,7 +135,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FeralTic">
-      <HintPath>..\..\..\vvvv_beta_39_x64\packs\dx11\core\FeralTic.dll</HintPath>
+      <HintPath>..\..\..\vvvv_beta_38.2-4262_preview_x64\packs\dx11\core\FeralTic.dll</HintPath>
     </Reference>
     <Reference Include="SlimDX">
       <HintPath>packages\VVVV.SlimDX.1.0.1\build\net40\lib\x86\SlimDX.dll</HintPath>
@@ -171,10 +171,10 @@
       <HintPath>packages\VVVV.Core.34.2.0\lib\net40\VVVV.Core.dll</HintPath>
     </Reference>
     <Reference Include="VVVV.DX11.Core">
-      <HintPath>..\..\..\vvvv_beta_39_x64\packs\dx11\core\VVVV.DX11.Core.dll</HintPath>
+      <HintPath>..\..\..\vvvv_beta_38.2-4262_preview_x64\packs\dx11\core\VVVV.DX11.Core.dll</HintPath>
     </Reference>
     <Reference Include="VVVV.DX11.Lib">
-      <HintPath>..\..\..\vvvv_beta_39_x64\packs\dx11\core\VVVV.DX11.Lib.dll</HintPath>
+      <HintPath>..\..\..\vvvv_beta_38.2-4262_preview_x64\packs\dx11\core\VVVV.DX11.Lib.dll</HintPath>
     </Reference>
     <Reference Include="VVVV.PluginInterfaces">
       <HintPath>packages\VVVV.PluginInterfaces.34.2.0\build\net40\lib\x86\VVVV.PluginInterfaces.dll</HintPath>
