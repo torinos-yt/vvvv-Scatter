@@ -226,6 +226,9 @@ namespace Nodes {
 			}
 
 			this->areaSum = area_sum;
+
+			//FLogger->Log(LogType::Debug, "areas size : " + areas->size().ToString());
+			//FLogger->Log(LogType::Debug, "positions size : " + positions->size().ToString());
 		}
 		else
 		{
