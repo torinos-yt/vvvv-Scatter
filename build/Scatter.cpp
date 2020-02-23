@@ -36,22 +36,45 @@ namespace Nodes {
 			auto _o = FOutput->GetWriter();
 			_o->Reset();
 
-			for (size_t i = 0; i < Count; ++i)
+			if (indices != nullptr)
 			{
-				float areaRandom = areaSum * rand01(mt);
+				for (size_t i = 0; i < Count; ++i)
+				{
+					float areaRandom = this->areaSum * rand01(mt);
 
-				auto ite = std::upper_bound(areas->begin(), areas->end(), areaRandom);
+					auto ite = std::upper_bound(areas->begin(), areas->end(), areaRandom);
 
-				size_t primNum = std::distance(areas->begin(), ite);
-				primNum = std::min(primNum, areas->size() - 1);
+					size_t primNum = std::distance(areas->begin(), ite);
+					primNum = std::min(primNum, areas->size() - 1);
 
-				const Vector3& p0 = positions[indices[(primNum * 3) + 0]];
-				const Vector3& p1 = positions[indices[(primNum * 3) + 1]];
-				const Vector3& p2 = positions[indices[(primNum * 3) + 2]];
+					const Vector3& p0 = positions[indices[(primNum * 3) + 0]];
+					const Vector3& p1 = positions[indices[(primNum * 3) + 1]];
+					const Vector3& p2 = positions[indices[(primNum * 3) + 2]];
 
-				Vector3D& p = randomPoint(p0, p1, p2, mt);
+					Vector3D& p = randomPoint(p0, p1, p2, mt);
 
-				_o->Write(p, 1);
+					_o->Write(p, 1);
+				}
+			}
+			else
+			{
+				for (size_t i = 0; i < Count; ++i)
+				{
+					float areaRandom = this->areaSum * rand01(mt);
+
+					auto ite = std::upper_bound(areas->begin(), areas->end(), areaRandom);
+
+					size_t primNum = std::distance(areas->begin(), ite);
+					primNum = std::min(primNum, areas->size() - 1);
+
+					const Vector3& p0 = positions[(primNum * 3) + 0];
+					const Vector3& p1 = positions[(primNum * 3) + 1];
+					const Vector3& p2 = positions[(primNum * 3) + 2];
+
+					Vector3D& p = randomPoint(p0, p1, p2, mt);
+
+					_o->Write(p, 1);
+				}
 			}
 
 			this->Invalidate = false;
@@ -147,14 +170,62 @@ namespace Nodes {
 
 			this->areaSum = area_sum;
 
-			FLogger->Log(LogType::Debug, "areas size : " + areas->size().ToString());
-			FLogger->Log(LogType::Debug, "positions size : " + positions->size().ToString());
-			FLogger->Log(LogType::Debug, "indices size : " + indices->SliceCount.ToString());
+			//FLogger->Log(LogType::Debug, "areas size : " + areas->size().ToString());
+			//FLogger->Log(LogType::Debug, "positions size : " + positions->size().ToString());
+			//FLogger->Log(LogType::Debug, "indices size : " + indices->SliceCount.ToString());
 
 		}
 		else if (geo->GetType() == DX11VertexGeometry::typeid)
 		{
 			DX11VertexGeometry^ Vgeo = (DX11VertexGeometry^)geo;
+
+			SlimDX::Direct3D11::Buffer^ vBuffer = Vgeo->VertexBuffer;
+
+			const size_t vCount = Vgeo->VerticesCount;
+			const size_t vSize = Vgeo->VertexSize;
+
+			positions->reserve(vCount);
+
+			auto vertexStaging = gcnew DX11StagingStructuredBuffer(device, vCount, vSize);
+			deviceContext->CopyResource(vBuffer, vertexStaging->Buffer);
+
+			DataStream^ vds = vertexStaging->MapForRead(deviceContext);
+
+			try
+			{
+				for (size_t i = 0; i < vCount; ++i)
+				{
+					positions->push_back(vds->Read<Vector3>());
+					vds->Seek(vSize - sizeof(Vector3), System::IO::SeekOrigin::Current);
+				}
+			}
+			catch (Exception ^ e)
+			{
+				FLogger->Log(LogType::Error, "Error in readback vertex: " + e->Message);
+			}
+			finally
+			{
+				vertexStaging->UnMap(deviceContext);
+				delete vertexStaging;
+			}
+
+			const size_t nPrims = vCount / 3;
+
+			float area_sum = 0;
+
+			for (size_t i = 0; i < nPrims; ++i)
+			{
+				const Vector3& p0 = positions[i + 0];
+				const Vector3& p1 = positions[i + 1];
+				const Vector3& p2 = positions[i + 2];
+
+				float area = (Vector3::Cross(Vector3::Subtract(p0, p1), Vector3::Subtract(p0, p2))).Length() / 2;
+
+				area_sum += area;
+				areas->push_back(area_sum);
+			}
+
+			this->areaSum = area_sum;
 		}
 		else
 		{
