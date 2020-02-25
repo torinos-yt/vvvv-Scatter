@@ -3,6 +3,7 @@
 
 # binary files
 plugins/*
+!Scatter.v4p
 
 
 # Visual Studio
