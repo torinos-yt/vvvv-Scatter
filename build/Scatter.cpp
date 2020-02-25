@@ -38,7 +38,7 @@ namespace Nodes {
 
 			if (indices != nullptr)
 			{
-				for (size_t i = 0; i < Count; ++i)
+				for (int i = 0; i < Count; ++i)
 				{
 					float areaRandom = this->areaSum * rand01(mt);
 
@@ -58,7 +58,7 @@ namespace Nodes {
 			}
 			else
 			{
-				for (size_t i = 0; i < Count; ++i)
+				for (int i = 0; i < Count; ++i)
 				{
 					float areaRandom = this->areaSum * rand01(mt);
 
@@ -75,7 +75,7 @@ namespace Nodes {
 
 					_o->Write(p, 1);
 				}
-			}
+		}
 
 			this->Invalidate = false;
 		}
@@ -185,6 +185,8 @@ namespace Nodes {
 			const size_t vSize = Vgeo->VertexSize;
 
 			positions->reserve(vCount);
+			//FLogger->Log(LogType::Debug, "vertices Count : " + vCount.ToString());
+
 
 			auto vertexStaging = gcnew DX11StagingStructuredBuffer(device, vCount, vSize);
 			deviceContext->CopyResource(vBuffer, vertexStaging->Buffer);
@@ -197,6 +199,7 @@ namespace Nodes {
 				{
 					positions->push_back(vds->Read<Vector3>());
 					vds->Seek(vSize - sizeof(Vector3), System::IO::SeekOrigin::Current);
+					//FLogger->Log(LogType::Debug, positions[i].X.ToString()+","+ positions[i].Y.ToString()+","+positions[i].Z.ToString());
 				}
 			}
 			catch (Exception ^ e)
